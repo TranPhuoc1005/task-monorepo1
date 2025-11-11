@@ -1,3 +1,4 @@
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Stack } from "expo-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PaperProvider } from "react-native-paper";
@@ -8,10 +9,12 @@ export default function RootLayout() {
     return (
         <QueryClientProvider client={queryClient}>
             <PaperProvider>
-                <Stack>
-                    <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                    <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                </Stack>
+                <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }} edges={["bottom"]}>
+                    <Stack initialRouteName="(auth)/login" screenOptions={{ headerShown: false }}>
+                        <Stack.Screen name="(auth)/login" />
+                        <Stack.Screen name="(tabs)/index" options={{ headerShown: false }} />
+                    </Stack>
+                </SafeAreaView>
             </PaperProvider>
         </QueryClientProvider>
     );

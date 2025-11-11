@@ -17,7 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
-import { UserProfile } from "@/types/user";
+import { UserProfile } from "@taskpro/shared";
 
 interface TaskModalProps {
     open: boolean;
@@ -28,7 +28,7 @@ interface TaskModalProps {
 }
 
 export default function TaskModal({ open, onOpenChange, task, defaultStatus, defaultDueDate }: TaskModalProps) {
-    const { addTask, updateTask, currentUser } = useTasks();
+    const { createTask, updateTask, currentUser } = useTasks();
     const supabase = createClient();
     const [users, setUsers] = useState<Pick<UserProfile, "id" | "email" | "full_name">[]>([]);
     const isEdit = !!task;
@@ -40,7 +40,6 @@ export default function TaskModal({ open, onOpenChange, task, defaultStatus, def
         description: task?.description || "",
         status: task?.status || defaultStatus,
         priority: task?.priority || "medium",
-        assignee: task?.assignee || "",
         dueDate: task?.due_date || defaultDueDate || "",
         tags: task?.tags?.join(", ") || "",
         user_id: task?.user_id || "",
@@ -81,7 +80,6 @@ export default function TaskModal({ open, onOpenChange, task, defaultStatus, def
                 description: formData.description,
                 status: formData.status as Task["status"],
                 priority: formData.priority as Task["priority"],
-                assignee: formData.assignee || undefined,
                 due_date: formData.dueDate || undefined,
                 tags: formData.tags ? formData.tags.split(",").map((t) => t.trim()) : [],
                 user_id: formData.user_id || undefined,
@@ -93,7 +91,7 @@ export default function TaskModal({ open, onOpenChange, task, defaultStatus, def
                     updates: taskData,
                 });
             } else {
-                await addTask.mutateAsync(taskData);
+                await createTask.mutateAsync(taskData);
             }
 
             onOpenChange(false);
@@ -111,7 +109,6 @@ export default function TaskModal({ open, onOpenChange, task, defaultStatus, def
             description: "",
             status: defaultStatus,
             priority: "medium",
-            assignee: "",
             dueDate: "",
             tags: "",
             user_id: task?.user_id || "",
@@ -134,23 +131,6 @@ export default function TaskModal({ open, onOpenChange, task, defaultStatus, def
                     </DialogHeader>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="user">Assign To</Label>
-                            <Select
-                                value={formData.user_id}
-                                onValueChange={(value) => setFormData({ ...formData, user_id: value })}>
-                                <SelectTrigger id="user">
-                                    <SelectValue placeholder="Select user" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {users.map((user) => (
-                                        <SelectItem key={user.id} value={user.id}>
-                                            {user.full_name || user.email}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
                         {/* Title */}
                         <div className="space-y-2">
                             <Label htmlFor="title">
@@ -233,18 +213,21 @@ export default function TaskModal({ open, onOpenChange, task, defaultStatus, def
                         {/* Assignee & Due Date */}
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="assignee">Assignee</Label>
-                                <Input
-                                    id="assignee"
-                                    value={formData.assignee}
-                                    onChange={(e) =>
-                                        setFormData({
-                                            ...formData,
-                                            assignee: e.target.value,
-                                        })
-                                    }
-                                    placeholder="John Doe"
-                                />
+                            <Label htmlFor="user">Assign To</Label>
+                                <Select
+                                    value={formData.user_id}
+                                    onValueChange={(value) => setFormData({ ...formData, user_id: value })}>
+                                    <SelectTrigger id="user">
+                                        <SelectValue placeholder="Select user" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {users.map((user) => (
+                                            <SelectItem key={user.id} value={user.id}>
+                                                {user.full_name || user.email}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
 
                             <div className="space-y-2">

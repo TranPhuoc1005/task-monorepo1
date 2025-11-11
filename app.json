@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "529729dc-2c84-4ab0-8df8-7e69462806ba"
+      }
+    },
+    "android": {
+      "package": "com.tranphuoc1005.taskpromonorepo"
+    }
+  }
+}

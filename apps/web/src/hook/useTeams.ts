@@ -7,5 +7,9 @@ import { useAuth } from "./useAuth";
 export function useTeams() {
   const supabase = createClient();
   const { currentUser } = useAuth();
-  return useSharedTeams(supabase, currentUser);
+  const shared = useSharedTeams(supabase, currentUser);
+  return {
+    ...shared,
+    currentUser,
+  };
 }

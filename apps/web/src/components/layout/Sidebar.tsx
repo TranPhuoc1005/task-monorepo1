@@ -35,6 +35,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
     const menuItems = [
         { icon: LayoutDashboard, label: "Dashboard", href: "/" },
+        { icon: LayoutDashboard, label: "Projects", href: "/projects" },
         { icon: CheckSquare, label: "Tasks", href: "/tasks" },
         { icon: Calendar, label: "Calendar", href: "/calendar" },
         { icon: Users, label: "Team", href: "/team" },

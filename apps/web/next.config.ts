@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
             },
         ],
     },
+    outputFileTracingRoot: "../../",
 };
 
 export default nextConfig;

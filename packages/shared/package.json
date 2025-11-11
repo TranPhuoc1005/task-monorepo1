@@ -1,16 +1,28 @@
 {
   "name": "@taskpro/shared",
   "version": "1.0.0",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "src/index.ts",
+  "type": "module",
   "dependencies": {
+    "@react-native-async-storage/async-storage": "2.2.0",
     "@supabase/supabase-js": "^2.39.0",
+    "@supabase/ssr": "^0.7.0",
     "@tanstack/react-query": "^5.0.0",
+    "expo-constants": "~18.0.10",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@types/node": "^20.19.24",
     "@types/react": "^18.2.0",
     "typescript": "^5.0.0"
+  },
+  "exports": {
+    "./lib/supabase": {
+      "react-native": "./lib/supabase/index.native.ts",
+      "default": "./lib/supabase/index.ts"
+    },
+    "./services/*": "./services/*.ts",
+    "./hooks/*": "./hooks/*.ts",
+    "./types/*": "./types/*.ts"
   }
 }

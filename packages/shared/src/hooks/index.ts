@@ -1,4 +1,5 @@
 export * from './useTasks';
+export * from './useProjects';
 export * from './useAuth';
 export * from './useTeams';
 export * from './useAdminUsers';

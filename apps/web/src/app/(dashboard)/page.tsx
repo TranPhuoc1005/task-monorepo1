@@ -12,7 +12,14 @@ import TaskTrendsChart from "@/components/dashboard/TaskTrendsChart";
 
 export default function HomePage() {
     const [dateRange, setDateRange] = useState<"7d" | "30d" | "90d">("7d");
-    const { stats, tasksByStatus, tasksByPriority, recentTasks, isLoading, error } = useDashboard();
+    const {
+        stats = { totalTasks: 0, inProgress: 0, completed: 0, overdue: 0 },
+        tasksByStatus = [],
+        tasksByPriority = [],
+        recentTasks = [],
+        isLoading,
+        error,
+    } = useDashboard();
 
     if (isLoading) {
         return (
@@ -38,28 +45,28 @@ export default function HomePage() {
         {
             title: "Total Tasks",
             value: stats.totalTasks.toString(),
-            change: stats.totalChange,
+            change: 0,
             icon: CheckSquare,
             color: "bg-blue-500",
         },
         {
             title: "In Progress",
             value: stats.inProgress.toString(),
-            change: stats.inProgressChange,
+            change: 0,
             icon: Clock,
             color: "bg-orange-500",
         },
         {
             title: "Completed",
             value: stats.completed.toString(),
-            change: stats.completedChange,
+            change: 0,
             icon: CheckSquare,
             color: "bg-green-500",
         },
         {
             title: "Overdue",
             value: stats.overdue.toString(),
-            change: stats.overdueChange,
+            change: 0,
             icon: AlertCircle,
             color: "bg-red-500",
         },

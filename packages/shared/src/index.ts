@@ -1,3 +1,4 @@
+export * from "./lib/supabase/client";
 export * from './types';
 export * from './api';
 export * from './hooks';

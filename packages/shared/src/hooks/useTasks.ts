@@ -1,48 +1,79 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { listTasksApi, createTaskApi, updateTaskApi, moveTaskApi, deleteTaskApi } from "../api/task.api";
-import { Task } from "../types/task";
+import { useAuth } from "./useAuth";
+import {
+    listTasksApi,
+    getTaskByIdApi,
+    createTaskApi,
+    updateTaskApi,
+    moveTaskApi,
+    deleteTaskApi,
+    updateDueDateApi,
+} from "../api/task.api";
 
-export function useSharedTasks(supabase: any) {
+export function useTasks() {
     const queryClient = useQueryClient();
+    const { currentUser } = useAuth();
 
     const tasksQuery = useQuery({
         queryKey: ["tasks"],
-        queryFn: () => listTasksApi(supabase),
+        queryFn: listTasksApi,
+        enabled: !!currentUser,
     });
 
-    const addTask = useMutation({
-        mutationFn: (taskData: Partial<Task>) => createTaskApi(supabase, taskData),
+    const createTask = useMutation({
+        mutationFn: createTaskApi,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["tasks"] });
+            queryClient.invalidateQueries({ queryKey: ["dashboard"] });
         },
     });
 
     const updateTask = useMutation({
-        mutationFn: ({ id, updates }: { id: number; updates: Partial<Task> }) => updateTaskApi(supabase, id, updates),
+        mutationFn: updateTaskApi,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["tasks"] });
+            queryClient.invalidateQueries({ queryKey: ["dashboard"] });
         },
     });
 
     const moveTask = useMutation({
-        mutationFn: ({ id, status }: { id: number; status: Task["status"] }) => moveTaskApi(supabase, id, status),
+        mutationFn: moveTaskApi,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["tasks"] });
+            queryClient.invalidateQueries({ queryKey: ["dashboard"] });
         },
     });
 
     const deleteTask = useMutation({
-        mutationFn: (id: number) => deleteTaskApi(supabase, id),
+        mutationFn: deleteTaskApi,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["tasks"] });
+            queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+        },
+    });
+
+    const updateDueDate = useMutation({
+        mutationFn: ({ id, due_date }: { id: number; due_date: string }) => updateDueDateApi(id, due_date),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["tasks"] });
         },
     });
 
     return {
-        tasksQuery,
-        addTask,
+        tasks: tasksQuery.data || [],
+        isLoading: tasksQuery.isLoading,
+        error: tasksQuery.error,
+        createTask,
         updateTask,
         moveTask,
         deleteTask,
     };
+}
+
+export function useTask(id: number) {
+    return useQuery({
+        queryKey: ["tasks", id],
+        queryFn: () => getTaskByIdApi(id),
+        enabled: !!id,
+    });
 }

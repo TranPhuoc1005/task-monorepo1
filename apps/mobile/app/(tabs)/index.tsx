@@ -1,98 +1,170 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React, { useState } from "react";
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, StyleSheet, Dimensions } from "react-native";
+import { useDashboard } from "../../../../packages/shared/src/hooks/useDashboard";
+import { CheckSquare, Clock, AlertCircle } from "lucide-react-native";
+import { Card } from "react-native-paper";
+import { BarChart, PieChart } from "react-native-chart-kit";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+const screenWidth = Dimensions.get("window").width;
 
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+export default function DashboardScreen() {
+    const [dateRange, setDateRange] = useState<"7d" | "30d" | "90d">("7d");
+    const { data, isLoading, error } = useDashboard();
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
+    const stats = data?.stats ?? { totalTasks: 0, inProgress: 0, completed: 0, overdue: 0, totalChange: 0, inProgressChange: 0, completedChange: 0, overdueChange: 0 };
+    const tasksByStatus = data?.tasksByStatus ?? [];
+    const tasksByPriority = data?.tasksByPriority ?? [];
+    const recentTasks = data?.recentTasks ?? [];
+
+    if (isLoading) {
+        return (
+            <View style={styles.center}>
+                <ActivityIndicator size="large" color="#2563eb" />
+            </View>
+        );
+    }
+
+    if (error) {
+        return (
+            <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>Error loading dashboard data</Text>
+            </View>
+        );
+    }
+
+    const statsData = [
+        { title: "Total Tasks", value: stats.totalTasks, icon: CheckSquare, color: "#3b82f6" },
+        { title: "In Progress", value: stats.inProgress, icon: Clock, color: "#f97316" },
+        { title: "Completed", value: stats.completed, icon: CheckSquare, color: "#22c55e" },
+        { title: "Overdue", value: stats.overdue, icon: AlertCircle, color: "#ef4444" },
+    ];
+
+    return (
+        <ScrollView contentContainerStyle={styles.container}>
+            {/* Header */}
+            <View style={styles.header}>
+                <View>
+                    <Text style={styles.title}>Dashboard</Text>
+                    <Text style={styles.subtitle}>Welcome back! Here's your task overview.</Text>
+                </View>
+
+                <View style={styles.filterGroup}>
+                    {["7d", "30d", "90d"].map((r) => (
+                        <TouchableOpacity
+                            key={r}
+                            onPress={() => setDateRange(r as any)}
+                            style={[styles.filterButton, dateRange === r && styles.filterButtonActive]}>
+                            <Text style={[styles.filterText, dateRange === r && styles.filterTextActive]}>
+                                {r === "7d" ? "7 Days" : r === "30d" ? "30 Days" : "90 Days"}
+                            </Text>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+            </View>
+
+            {/* Stats Cards */}
+            <View style={styles.statsGrid}>
+                {statsData.map((item, i) => (
+                    <Card key={i} style={styles.statCard}>
+                        <View style={styles.cardContent}>
+                            <item.icon color={item.color} size={28} />
+                            <View>
+                                <Text style={styles.statTitle}>{item.title}</Text>
+                                <Text style={styles.statValue}>{item.value}</Text>
+                            </View>
+                        </View>
+                    </Card>
+                ))}
+            </View>
+
+            {/* Charts */}
+            <View style={{ marginTop: 24 }}>
+                <Text style={styles.sectionTitle}>Tasks by Status</Text>
+                <BarChart
+                    data={{
+                        labels: tasksByStatus.map((t) => t.status),
+                        datasets: [{ data: tasksByStatus.map((t) => t.count) }],
+                    }}
+                    width={screenWidth - 32}
+                    height={220}
+                    fromZero
+                    showValuesOnTopOfBars
+                    yAxisLabel=""
+                    yAxisSuffix=""
+                    chartConfig={{
+                        backgroundGradientFrom: "#fff",
+                        backgroundGradientTo: "#fff",
+                        color: (opacity = 1) => `rgba(37, 99, 235, ${opacity})`,
+                        labelColor: () => "#1e293b",
+                    }}
+                    style={styles.chart}
+                />
+            </View>
+
+            <View style={{ marginTop: 24 }}>
+                <Text style={styles.sectionTitle}>Tasks by Priority</Text>
+                <PieChart
+                    data={tasksByPriority.map((t, i) => ({
+                        name: t.priority,
+                        population: t.count,
+                        color: ["#22c55e", "#facc15", "#ef4444"][i % 3],
+                        legendFontColor: "#1e293b",
+                        legendFontSize: 14,
+                    }))}
+                    width={screenWidth - 32}
+                    height={220}
+                    chartConfig={{
+                        backgroundGradientFrom: "#fff",
+                        backgroundGradientTo: "#fff",
+                        color: (opacity = 1) => `rgba(37, 99, 235, ${opacity})`,
+                    }}
+                    accessor="population"
+                    backgroundColor="transparent"
+                    paddingLeft="15"
+                    absolute
+                />
+            </View>
+
+            {/* Recent Tasks */}
+            <View style={{ marginTop: 24 }}>
+                <Text style={styles.sectionTitle}>Recent Tasks</Text>
+                {recentTasks.map((t) => (
+                    <View key={t.id} style={styles.taskItem}>
+                        <Text style={styles.taskTitle}>{t.title}</Text>
+                        <Text style={styles.taskStatus}>{t.status}</Text>
+                    </View>
+                ))}
+            </View>
+        </ScrollView>
+    );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
+    container: { padding: 16, paddingTop: 60, paddingBottom: 40 },
+    center: { flex: 1, justifyContent: "center", alignItems: "center" },
+    errorContainer: { padding: 16, backgroundColor: "#fee2e2", borderRadius: 8 },
+    errorText: { color: "#b91c1c", textAlign: "center" },
+
+    header: { flexDirection: "column", gap: 15, justifyContent: "flex-start", alignItems: "flex-start", marginBottom: 16 },
+    title: { fontSize: 24, fontWeight: "700", color: "#0f172a" },
+    subtitle: { fontSize: 14, color: "#475569" },
+
+    filterGroup: { flexDirection: "row", gap: 8 },
+    filterButton: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: 6, backgroundColor: "#e2e8f0" },
+    filterButtonActive: { backgroundColor: "#2563eb" },
+    filterText: { color: "#475569", fontWeight: "600" },
+    filterTextActive: { color: "#fff" },
+
+    statsGrid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", gap: 12 },
+    statCard: { width: "47%", padding: 12 },
+    cardContent: { flexDirection: "row", alignItems: "center", gap: 12 },
+    statTitle: { color: "#64748b", fontSize: 14 },
+    statValue: { color: "#0f172a", fontSize: 20, fontWeight: "700" },
+
+    sectionTitle: { fontSize: 18, fontWeight: "700", marginBottom: 8, color: "#0f172a" },
+    chart: { borderRadius: 12, marginVertical: 8 },
+
+    taskItem: { backgroundColor: "#f1f5f9", padding: 12, borderRadius: 8, marginBottom: 8 },
+    taskTitle: { fontSize: 16, fontWeight: "600", color: "#0f172a" },
+    taskStatus: { fontSize: 13, color: "#64748b" },
 });

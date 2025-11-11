@@ -36,7 +36,7 @@ export async function GET() {
             `)
             .order("created_at", { ascending: false });
 
-        // Nếu là employee, chỉ lấy tasks của chính mình
+        // Nếu là employee, chỉ lấy tasks của chínhmình
         if (profile.role === "employee") {
             query = query.eq("user_id", user.id);
         }

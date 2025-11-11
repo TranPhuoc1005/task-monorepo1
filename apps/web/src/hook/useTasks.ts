@@ -1,14 +1,12 @@
 "use client";
 
-import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "./useAuth";
-import { useSharedTasks } from "@taskpro/shared";
+import { useTasks as useSharedTasks } from "@taskpro/shared";
 
 export function useTasks() {
-    const supabase = createClient();
     const { currentUser } = useAuth();
 
-    const sharedTasks = useSharedTasks(supabase);
+    const sharedTasks = useSharedTasks();
 
     return {
         ...sharedTasks,

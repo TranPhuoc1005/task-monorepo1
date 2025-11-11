@@ -1,0 +1,69 @@
+
+> web@0.1.0 build E:\CyperSoft\taskpro-monorepo\apps\web
+> next build
+
+ ⚠ Invalid next.config.mjs options detected: 
+ ⚠     Expected object, received boolean at "experimental.turbo"
+ ⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
+ ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of E:\CyperSoft\taskpro-monorepo\pnpm-lock.yaml as the root directory.
+ To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+ Detected additional lockfiles: 
+   * E:\CyperSoft\taskpro-monorepo\apps\web\package-lock.json
+
+   ▲ Next.js 15.5.4
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (118kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+ ✓ Compiled successfully in 40s
+   Linting and checking validity of types ...
+
+./src/app/(dashboard)/settings/page.tsx
+42:19  Warning: 'profile' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+74:8  Warning: React Hook useEffect has a missing dependency: 'loadSettings'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+   Collecting page data ...
+   Generating static pages (0/23) ...
+   Generating static pages (5/23) 
+   Generating static pages (11/23) 
+   Generating static pages (17/23) 
+ ✓ Generating static pages (23/23)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                 Size  First Load JS
+┌ ○ /                                     106 kB         276 kB
+├ ○ /_not-found                            993 B         103 kB
+├ ƒ /api/create-user                       151 B         102 kB
+├ ƒ /api/notifications                     151 B         102 kB
+├ ƒ /api/profile                           151 B         102 kB
+├ ƒ /api/tasks                             151 B         102 kB
+├ ƒ /api/tasks/due-date                    151 B         102 kB
+├ ƒ /api/tasks/move                        151 B         102 kB
+├ ƒ /api/team-members                      151 B         102 kB
+├ ƒ /api/team-members/role                 151 B         102 kB
+├ ƒ /api/teams                             151 B         102 kB
+├ ƒ /api/users                             151 B         102 kB
+├ ƒ /api/users/role                        151 B         102 kB
+├ ○ /calendar                            2.98 kB         212 kB
+├ ○ /login                               42.2 kB         206 kB
+├ ○ /profile                             4.77 kB         174 kB
+├ ○ /settings                            6.47 kB         182 kB
+├ ○ /tasks                               3.47 kB         212 kB
+├ ƒ /tasks/[id]                            151 B         102 kB
+├ ○ /team                                2.24 kB         169 kB
+└ ○ /users                               4.99 kB         186 kB
++ First Load JS shared by all             102 kB
+  ├ chunks/22826e1c-a60f68439ec4a62e.js  54.2 kB
+  ├ chunks/460-43574f6e3f2b2a78.js       45.8 kB
+  └ other shared chunks (total)          2.02 kB
+
+
+ƒ Middleware                             79.9 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

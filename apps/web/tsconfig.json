@@ -29,8 +29,8 @@
             "@taskpro/shared": [
                 "../../packages/shared/src/index.ts"
             ],
-            "@taskpro/shared/*": [
-                "../../packages/shared/src/*"
+            "@taskpro/shared/lib/supabase/client": [
+                "../../packages/shared/src/lib/supabase/client.web.ts"
             ]
         }
     },
@@ -41,6 +41,8 @@
         ".next/types/**/*.ts"
     ],
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "supabase/functions",
+        "../../packages/shared/src/lib/supabase/client.native.ts"
     ]
 }
