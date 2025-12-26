@@ -1,5 +1,5 @@
-import { createClient } from "@/lib/supabase/client";
-import { Task } from "@/types";
+import { createClient } from "../lib/supabase/client";
+import { Task } from "../types";
 
 export const listTasksApi = async (): Promise<Task[]> => {
     const supabase = createClient();
@@ -69,9 +69,25 @@ export const createTaskApi = async (taskData: Partial<Task>): Promise<Task> => {
 
     if (!user) throw new Error("Not authenticated");
 
+    // Prepare task data - remove id if it exists (auto-generated)
+    const { id, profiles, ...cleanTaskData } = taskData as any;
+
+    // If user_id is not provided or is invalid, use current user
+    const dataToInsert = {
+        ...cleanTaskData,
+        created_by: user.id,
+        // Only include user_id if it's a valid UUID, otherwise use current user
+        user_id:
+            cleanTaskData.user_id && typeof cleanTaskData.user_id === "string" && cleanTaskData.user_id.length > 10
+                ? cleanTaskData.user_id
+                : user.id,
+    };
+
+    console.log("Creating task with data:", dataToInsert);
+
     const { data, error } = await supabase
         .from("tasks")
-        .insert([{ ...taskData, created_by: user.id }])
+        .insert([dataToInsert])
         .select(
             `
             *,
@@ -85,16 +101,31 @@ export const createTaskApi = async (taskData: Partial<Task>): Promise<Task> => {
         )
         .single();
 
-    if (error) throw error;
+    if (error) {
+        console.error("Create task error:", error);
+        throw error;
+    }
     return data;
 };
 
 export const updateTaskApi = async ({ id, updates }: { id: number; updates: Partial<Task> }): Promise<Task> => {
     const supabase = createClient();
 
+    // Remove fields that shouldn't be updated
+    const { profiles, created_by, created_at, ...cleanUpdates } = updates as any;
+
+    // Validate user_id if it's being updated
+    if (cleanUpdates.user_id !== undefined) {
+        if (!cleanUpdates.user_id || typeof cleanUpdates.user_id !== "string" || cleanUpdates.user_id.length < 10) {
+            delete cleanUpdates.user_id;
+        }
+    }
+
+    console.log("Updating task with data:", cleanUpdates);
+
     const { data, error } = await supabase
         .from("tasks")
-        .update({ ...updates, updated_at: new Date().toISOString() })
+        .update({ ...cleanUpdates, updated_at: new Date().toISOString() })
         .eq("id", id)
         .select(
             `
@@ -109,7 +140,10 @@ export const updateTaskApi = async ({ id, updates }: { id: number; updates: Part
         )
         .single();
 
-    if (error) throw error;
+    if (error) {
+        console.error("Update task error:", error);
+        throw error;
+    }
     return data;
 };
 
@@ -147,12 +181,7 @@ export const deleteTaskApi = async (id: number): Promise<void> => {
 export const updateDueDateApi = async (id: number, due_date: string): Promise<Task> => {
     const supabase = createClient();
 
-    const { data, error } = await supabase
-        .from("tasks")
-        .update({ due_date })
-        .eq("id", id)
-        .select("*")
-        .single();
+    const { data, error } = await supabase.from("tasks").update({ due_date }).eq("id", id).select("*").single();
 
     if (error) {
         console.error("updateDueDateApi ~ error:", error);

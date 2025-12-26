@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { listUsersApi } from "../api/user.api";
 import type { User } from "../types/user";
-import { createClient } from "@/lib/supabase/client.web";
+import { createClient } from "../lib/supabase/client.web";
 
 export function useUsers() {
     const supabase = createClient();

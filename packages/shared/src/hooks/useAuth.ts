@@ -3,9 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { getProfileApi } from "../api/profile.api";
 import { createClient } from "../lib/supabase/client";
 
-const supabase = createClient();
-
-export function useAuth() {
+export function useAuth(externalSupabase?: any) {
+    const supabase = externalSupabase ?? createClient();
     const [user, setUser] = useState<any>(null);
     const [authLoading, setAuthLoading] = useState(true);
 
@@ -28,7 +27,7 @@ export function useAuth() {
         });
 
         return () => subscription.unsubscribe();
-    }, []);
+    }, [supabase]);
 
     const profileQuery = useQuery({
         queryKey: ["profile", user?.id],

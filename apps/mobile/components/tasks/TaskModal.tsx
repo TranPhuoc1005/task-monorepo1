@@ -33,7 +33,7 @@ interface UserOption {
 }
 
 export default function TaskModal({ visible, task, defaultStatus = "todo", defaultDueDate, onClose }: TaskModalProps) {
-    const { addTask, updateTask, currentUser } = useTasks();
+    const { createTask, updateTask, currentUser } = useTasks();
     const [users, setUsers] = useState<UserOption[]>([]);
     const [loading, setLoading] = useState(false);
 
@@ -42,7 +42,7 @@ export default function TaskModal({ visible, task, defaultStatus = "todo", defau
         description: "",
         status: defaultStatus,
         priority: "medium" as Task["priority"],
-        assignee: "",
+        due_date: "",
         user_id: "",
         tags: "",
     });
@@ -60,7 +60,7 @@ export default function TaskModal({ visible, task, defaultStatus = "todo", defau
                 description: task.description || "",
                 status: task.status || defaultStatus,
                 priority: task.priority || "medium",
-                assignee: task.assignee || "",
+                due_date: task?.due_date || defaultDueDate || "",
                 user_id: task.user_id || "",
                 tags: task.tags?.join(", ") || "",
             });
@@ -96,7 +96,7 @@ export default function TaskModal({ visible, task, defaultStatus = "todo", defau
             description: "",
             status: defaultStatus,
             priority: "medium",
-            assignee: "",
+            due_date: "",
             user_id: "",
             tags: "",
         });
@@ -117,7 +117,6 @@ export default function TaskModal({ visible, task, defaultStatus = "todo", defau
                 description: formData.description,
                 status: formData.status,
                 priority: formData.priority,
-                assignee: formData.assignee || undefined,
                 user_id: formData.user_id || undefined,
                 due_date: dueDate?.toISOString() || undefined,
                 tags: formData.tags
@@ -135,7 +134,7 @@ export default function TaskModal({ visible, task, defaultStatus = "todo", defau
                 });
                 Alert.alert("Success", "Task updated successfully");
             } else {
-                await addTask.mutateAsync(taskData);
+                await createTask.mutateAsync(taskData);
                 Alert.alert("Success", "Task created successfully");
             }
 
@@ -156,7 +155,6 @@ export default function TaskModal({ visible, task, defaultStatus = "todo", defau
                 text: "Delete",
                 style: "destructive",
                 onPress: async () => {
-                    // TODO: Implement delete
                     onClose();
                 },
             },
@@ -257,20 +255,13 @@ export default function TaskModal({ visible, task, defaultStatus = "todo", defau
                         <Text style={styles.label}>Assignee</Text>
                         <View style={styles.pickerContainer}>
                             <Picker
-                            selectedValue={formData.user_id}
-                            onValueChange={(value) => {
-                                const selected = users.find((u) => u.id === value);
-                                setFormData({
-                                ...formData,
-                                user_id: value,
-                                assignee: selected?.label || "",
-                                });
-                            }}
-                            enabled={!loading}>
-                            <Picker.Item label="Select user..." value="" />
-                            {users.map((u) => (
-                                <Picker.Item key={u.id} label={u.label} value={u.id} />
-                            ))}
+                                selectedValue={formData.user_id}
+                                onValueChange={(value) => setFormData({ ...formData, user_id: value })}
+                                enabled={!loading}>
+                                <Picker.Item label="Select user..." value="" />
+                                {users.map((u) => (
+                                    <Picker.Item key={u.id} label={u.label} value={u.id} />
+                                ))}
                             </Picker>
                         </View>
                     </View>

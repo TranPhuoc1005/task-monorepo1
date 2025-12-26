@@ -1,12 +1,14 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { View, Text, ScrollView, TouchableOpacity, Modal, StyleSheet } from "react-native";
-import { useTasks } from "../../hooks/useTasks";
 import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
 import TaskModal from "../../components/tasks/TaskModal";
+import { useAuth } from "@/useAuth";
+import { useTasks } from "@/useTasks";
 
 export default function CalendarScreen() {
-    const { tasksQuery, currentUser } = useTasks();
+    const { tasks, isLoading } = useTasks();
+    const { currentUser } = useAuth();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [modalVisible, setModalVisible] = useState(false);
@@ -14,8 +16,12 @@ export default function CalendarScreen() {
     const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
     const [selectedDateForTask, setSelectedDateForTask] = useState<string | undefined>(undefined);
 
-    const tasks = tasksQuery.data || [];
     const canCreateTask = currentUser?.profile?.role === "admin" || currentUser?.profile?.role === "manager";
+
+    // useEffect(() => {
+    //     console.log("Calendar - Total tasks:", tasks?.length);
+    //     console.log("Calendar - Tasks with due_date:", tasks?.filter((t) => t.due_date).length);
+    // }, [tasks]);
 
     // ===== Calendar logic =====
     const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
@@ -36,14 +42,20 @@ export default function CalendarScreen() {
     }, [startDate, monthEnd]);
 
     const getTasksForDate = (date: Date) => {
+        if (!tasks || tasks.length === 0) return [];
+
         return tasks.filter((task) => {
             if (!task.due_date) return false;
-            const taskDate = new Date(task.due_date);
-            return (
-                taskDate.getDate() === date.getDate() &&
-                taskDate.getMonth() === date.getMonth() &&
-                taskDate.getFullYear() === date.getFullYear()
-            );
+
+            try {
+                const taskDate = new Date(task.due_date);
+                const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+                const taskDateOnly = new Date(taskDate.getFullYear(), taskDate.getMonth(), taskDate.getDate());
+                return dateOnly.getTime() === taskDateOnly.getTime();
+            } catch (error) {
+                console.error("Error parsing date:", task.due_date, error);
+                return false;
+            }
         });
     };
 
@@ -98,6 +110,13 @@ export default function CalendarScreen() {
                     </Text>
                 ))}
             </View>
+
+            {/* Loading indicator */}
+            {isLoading && (
+                <View style={styles.loadingContainer}>
+                    <Text style={styles.loadingText}>Loading tasks...</Text>
+                </View>
+            )}
 
             {/* Calendar grid */}
             <ScrollView showsVerticalScrollIndicator={false}>
@@ -158,11 +177,22 @@ export default function CalendarScreen() {
                                                 {task.description}
                                             </Text>
                                         ) : null}
-                                        <View style={styles.timeRow}>
-                                            <Ionicons name="time-outline" size={14} color="#6b7280" />
-                                            <Text style={styles.timeText}>
-                                                {task.due_date ? format(new Date(task.due_date), "hh:mm a") : ""}
-                                            </Text>
+                                        <View style={styles.taskMeta}>
+                                            <View
+                                                style={[
+                                                    styles.priorityBadge,
+                                                    { backgroundColor: getPriorityColor(task.priority) },
+                                                ]}>
+                                                <Text style={styles.priorityText}>{task.priority}</Text>
+                                            </View>
+                                            {task.due_date && (
+                                                <View style={styles.timeRow}>
+                                                    <Ionicons name="time-outline" size={14} color="#6b7280" />
+                                                    <Text style={styles.timeText}>
+                                                        {format(new Date(task.due_date), "hh:mm a")}
+                                                    </Text>
+                                                </View>
+                                            )}
                                         </View>
                                     </View>
                                 ))
@@ -194,7 +224,10 @@ export default function CalendarScreen() {
                 visible={isTaskModalOpen}
                 defaultStatus="todo"
                 defaultDueDate={selectedDateForTask}
-                onClose={() => setIsTaskModalOpen(false)}
+                onClose={() => {
+                    setIsTaskModalOpen(false);
+                    setSelectedDateForTask(undefined);
+                }}
             />
         </View>
     );
@@ -212,12 +245,22 @@ const styles = StyleSheet.create({
     monthText: { fontSize: 18, fontWeight: "bold", color: "#1f2937" },
     weekdays: { flexDirection: "row", justifyContent: "space-between", marginBottom: 8 },
     weekdayText: { flex: 1, textAlign: "center", color: "#4b5563", fontWeight: "600" },
+    loadingContainer: {
+        padding: 16,
+        alignItems: "center",
+    },
+    loadingText: {
+        color: "#6b7280",
+        fontSize: 14,
+    },
     calendarGrid: { flexDirection: "row", flexWrap: "wrap" },
     dayBox: {
         width: "14.28%",
+        aspectRatio: 1,
         borderWidth: 1,
         borderColor: "#e5e7eb",
         padding: 4,
+        minHeight: 60,
     },
     dayCircle: {
         width: 24,
@@ -232,6 +275,7 @@ const styles = StyleSheet.create({
         height: 6,
         borderRadius: 4,
         marginTop: 2,
+        marginHorizontal: 2,
     },
     moreText: {
         fontSize: 10,
@@ -258,12 +302,29 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "#e5e7eb",
         borderRadius: 6,
-        padding: 8,
+        padding: 12,
         marginBottom: 8,
     },
-    taskTitle: { fontWeight: "600", color: "#1f2937" },
+    taskTitle: { fontWeight: "600", color: "#1f2937", fontSize: 15 },
     taskDesc: { fontSize: 13, color: "#4b5563", marginTop: 4 },
-    timeRow: { flexDirection: "row", alignItems: "center", marginTop: 4 },
+    taskMeta: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginTop: 8,
+        gap: 8,
+    },
+    priorityBadge: {
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 4,
+    },
+    priorityText: {
+        color: "#fff",
+        fontSize: 10,
+        fontWeight: "600",
+        textTransform: "uppercase",
+    },
+    timeRow: { flexDirection: "row", alignItems: "center" },
     timeText: { fontSize: 12, color: "#4b5563", marginLeft: 4 },
     noTaskContainer: { alignItems: "center", justifyContent: "center", paddingVertical: 32 },
     noTaskText: { color: "#6b7280", marginTop: 8 },

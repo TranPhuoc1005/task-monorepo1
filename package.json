@@ -6,7 +6,7 @@
     "apps/*",
     "packages/*"
   ],
-  "packageManager": "pnpm@9.12.2", 
+  "packageManager": "pnpm@9.12.2",
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
@@ -15,6 +15,7 @@
     "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules"
   },
   "devDependencies": {
+    "babel-plugin-module-resolver": "^5.0.2",
     "turbo": "^2.0.0",
     "typescript": "^5.0.0"
   }

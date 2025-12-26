@@ -7,7 +7,7 @@ import { useTasks } from "@/hook/useTasks";
 import { UserX, Users } from "lucide-react";
 
 export default function KanbanBoard() {
-    const { tasks, moveTask, currentUser, error, isLoading } = useTasks();  
+    const { tasks, moveTask, currentUser, isLoading } = useTasks();  
     const [draggedTask, setDraggedTask] = useState<Task | null>(null);
     const [showOnlyUnassigned, setShowOnlyUnassigned] = useState(false);
 
@@ -23,7 +23,6 @@ export default function KanbanBoard() {
         return (tasks || []).filter((task) => !task.user_id).length;
     }, [tasks]);
 
-    if (error) return <p className="p-6 text-red-500">Error: {error.message}</p>;
 
     const columns: Column[] = [
         {

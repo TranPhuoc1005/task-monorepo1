@@ -1,4 +1,3 @@
-// apps/mobile/app/(tabs)/_layout.tsx
 import { Tabs } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useAuth } from "@/useAuth";
@@ -118,10 +117,12 @@ export default function TabsLayout() {
                 }}
             />
             <Tabs.Screen
-                name="profile"
+                name="projects"
                 options={{
-                    title: getDisplayName(),
-                    tabBarIcon: ({ focused, size }) => <AvatarTabIcon focused={focused} size={size} />,
+                    title: "Projects",
+                    tabBarIcon: ({ color, size }) => (
+                        <MaterialCommunityIcons name="clipboard-plus-outline" size={size} color={color} />
+                    ),
                 }}
             />
         </Tabs>

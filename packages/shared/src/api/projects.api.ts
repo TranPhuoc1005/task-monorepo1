@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "../lib/supabase/client";
 import { Project, ProjectMember } from "../types/projects";
 
 export const listProjectsApi = async (): Promise<Project[]> => {

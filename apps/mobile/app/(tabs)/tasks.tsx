@@ -12,11 +12,10 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { Task } from "../../../../packages/shared/src/types/task";
 import { LinearGradient } from "expo-linear-gradient";
-import { useAuth } from "@/useAuth";
-import { useSharedTasks } from "@taskpro/shared";
-import { supabase } from "@/supabase";
 import TaskCard from "@/tasks/TaskCard";
 import TaskModal from "@/tasks/TaskModal";
+import { useTasks } from "@/useTasks";
+import { useAuth } from "@/useAuth";
 
 const { width } = Dimensions.get("window");
 const COLUMN_WIDTH = width;
@@ -29,16 +28,14 @@ const COLUMNS = [
 ];
 
 export default function TasksScreen() {
+    const { tasks, isLoading } = useTasks();
     const { currentUser } = useAuth();
-    const { tasksQuery, addTask, updateTask, moveTask, deleteTask } = useSharedTasks(supabase);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedTask, setSelectedTask] = useState<Task | null>(null);
     const [defaultStatus, setDefaultStatus] = useState<Task["status"]>("todo");
     const scrollViewRef = useRef<ScrollView>(null);
     const scrollX = useRef(new Animated.Value(0)).current;
 
-    const tasks = tasksQuery.data || [];
-    const isLoading = tasksQuery.isLoading;
     const canCreateTask = currentUser?.profile?.role === "admin" || currentUser?.profile?.role === "manager";
 
     const getTasksByStatus = (status: Task["status"]) => {
@@ -54,10 +51,6 @@ export default function TasksScreen() {
     const handleEditTask = (task: Task) => {
         setSelectedTask(task);
         setIsModalOpen(true);
-    };
-
-    const onRefresh = () => {
-        tasksQuery.refetch();
     };
 
     return (
@@ -128,7 +121,7 @@ export default function TasksScreen() {
                     useNativeDriver: false,
                 })}
                 contentContainerStyle={{
-                    paddingRight: 40,
+                    paddingRight: 3,
                 }}>
                 {COLUMNS.map((column) => {
                     const columnTasks = getTasksByStatus(column.id as Task["status"]);
@@ -164,7 +157,7 @@ export default function TasksScreen() {
                                 showsVerticalScrollIndicator={false}
                                 overScrollMode="never"
                                 bounces={false}
-                                refreshControl={<RefreshControl refreshing={isLoading} onRefresh={onRefresh} />}
+                                refreshControl={<RefreshControl refreshing={isLoading} />}
                                 contentContainerStyle={styles.tasksListContent}>
                                 {columnTasks.length === 0 ? (
                                     <View style={styles.emptyState}>

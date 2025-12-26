@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useProjects } from "@taskpro/shared";
 import ProjectModal from "@/components/projects/ProjectModal";
+import { useRouter } from "next/navigation";
 
 const PROJECT_TYPE_LABELS = {
     web_development: "Web Development",
@@ -32,6 +33,7 @@ const PRIORITY_COLORS = {
 };
 
 export default function ProjectsPage() {
+    const router = useRouter();
     const { projects, isLoading, createProject, currentUser } = useProjects();
     const [searchTerm, setSearchTerm] = useState("");
     const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -211,7 +213,7 @@ export default function ProjectsPage() {
                             <div
                                 key={project.id}
                                 className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-lg transition-all duration-200 overflow-hidden group cursor-pointer"
-                                onClick={() => setSelectedProject(project as any)}>
+                                onClick={() => router.push(`/projects/${project.id}`)}>
                                 {/* Color Bar */}
                                 <div className="h-2" style={{ backgroundColor: project.color }} />
 

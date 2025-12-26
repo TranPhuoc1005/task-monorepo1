@@ -1,5 +1,5 @@
-import { createClient } from "@/lib/supabase/client";
-import { Task } from "@/types";
+import { createClient } from "../lib/supabase/client";
+import { Task } from "../types";
 
 export interface DashboardStats {
     totalTasks: number;

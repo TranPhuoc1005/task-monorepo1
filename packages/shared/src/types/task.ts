@@ -10,12 +10,15 @@ export interface Task {
     created_by?: string;
     created_at: string;
     updated_at: string;
+    project_id?: string;
     profiles?: {
         id: string;
         email: string;
         full_name?: string;
         department?: string;
     } | null;
+
+    estimated_hours?: number;
 }
 
 export interface Column {
