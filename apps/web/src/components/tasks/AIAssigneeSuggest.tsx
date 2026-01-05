@@ -127,7 +127,8 @@ Trả về JSON thuần túy, KHÔNG có markdown, KHÔNG có backticks:
   "suggestions": ["gợi ý tối ưu"]
 }`;
 
-            // Call through Next.js API route to avoid CORS
+            console.log("🤖 Calling AI API...");
+
             const response = await fetch("/api/ai-suggest", {
                 method: "POST",
                 headers: {
@@ -138,26 +139,41 @@ Trả về JSON thuần túy, KHÔNG có markdown, KHÔNG có backticks:
                 }),
             });
 
+            console.log("📡 Response status:", response.status);
+
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || "Failed to get AI recommendations");
+                const errorText = await response.text();
+                console.error("❌ API Error:", errorText);
+                throw new Error(`API Error (${response.status}): ${errorText}`);
             }
 
             const data = await response.json();
-            const textContent = data.content.find((block: any) => block.type === "text")?.text || "";
+            console.log("✅ API Response:", data);
+
+            const textContent = data.content?.find((block: any) => block.type === "text")?.text || "";
+
+            if (!textContent) {
+                throw new Error("No text content in response");
+            }
+
+            console.log("📝 Text content:", textContent.substring(0, 200));
 
             const cleanJson = textContent
                 .replace(/```json\n?/g, "")
                 .replace(/```\n?/g, "")
                 .trim();
+
+            console.log("🧹 Cleaned JSON:", cleanJson.substring(0, 200));
+
             const result = JSON.parse(cleanJson);
+            console.log("✅ Parsed result:", result);
 
             setRecommendations(result.recommendations || []);
             setWarnings(result.warnings || []);
             setSuggestions(result.suggestions || []);
-        } catch (error) {
-            console.error("AI Error:", error);
-            alert("Có lỗi xảy ra khi gọi AI. Vui lòng thử lại.");
+        } catch (error: any) {
+            console.error("❌ AI Error:", error);
+            alert(`Có lỗi xảy ra: ${error.message}`);
         } finally {
             setLoading(false);
         }

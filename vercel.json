@@ -1,0 +1,4 @@
+{
+  "installCommand": "pnpm install --filter ./apps/web...",
+  "buildCommand": "pnpm --filter ./apps/web build"
+}
