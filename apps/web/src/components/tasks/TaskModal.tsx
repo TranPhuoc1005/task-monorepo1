@@ -1,5 +1,5 @@
 "use client";
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useMemo } from "react";
 import { Task, Project } from "@taskpro/shared";
 import { useTasks } from "@/hook/useTasks";

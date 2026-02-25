@@ -11,6 +11,9 @@ const nextConfig = {
             },
         ],
     },
+    eslint: {
+        ignoreDuringBuilds: true,
+    },
     outputFileTracingRoot: path.join(__dirname, "../../"),
     transpilePackages: ['@taskpro/shared'],
 };

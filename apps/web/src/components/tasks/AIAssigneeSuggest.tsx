@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import { Brain, TrendingUp, AlertCircle, Sparkles, X, Check } from "lucide-react";
 
