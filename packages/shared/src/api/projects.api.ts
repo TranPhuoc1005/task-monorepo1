@@ -23,10 +23,12 @@ export const listProjectsApi = async (): Promise<Project[]> => {
 
         let query = supabase
             .from("projects")
-            .select(`
+            .select(
+                `
                 *,
                 project_manager:project_manager_id(id, full_name, email)
-            `)
+            `,
+            )
             .order("created_at", { ascending: false });
 
         // Employee chỉ thấy projects mình tham gia
@@ -42,7 +44,7 @@ export const listProjectsApi = async (): Promise<Project[]> => {
                 return [];
             }
 
-            const projectIds = memberProjects.map((m: any) => m.project_id);
+            const projectIds = memberProjects.map((m: { project_id: string }) => m.project_id);
             query = query.in("id", projectIds);
         }
 
@@ -52,23 +54,27 @@ export const listProjectsApi = async (): Promise<Project[]> => {
         if (!projects || projects.length === 0) return [];
 
         // Get all project manager IDs
-        const pmIds = [...new Set(projects.map((p: any) => p.project_manager_id).filter(Boolean))];
-        
-        // Get all project managers
-        const { data: managers } = await supabase
-            .from("profiles")
-            .select("id, full_name, email")
-            .in("id", pmIds);
+        const pmIds = [
+            ...new Set(
+                projects.map((p: { project_manager_id: string | null }) => p.project_manager_id).filter(Boolean),
+            ),
+        ];
 
-        const managerMap = new Map(managers?.map(m => [m.id, m]) || []);
+        // Get all project managers
+        const { data: managers } = await supabase.from("profiles").select("id, full_name, email").in("id", pmIds);
+
+        const managerMap = new Map(
+            managers?.map((m: { id: string; full_name: string; email: string }) => [m.id, m]) || [],
+        );
 
         // Get all project IDs
-        const projectIds = projects.map(p => p.id);
+        const projectIds = projects.map((p: { id: string }) => p.id);
 
         // Get all members for all projects
         const { data: allMembers } = await supabase
             .from("project_members")
-            .select(`
+            .select(
+                `
                 id,
                 user_id,
                 project_id,
@@ -76,46 +82,51 @@ export const listProjectsApi = async (): Promise<Project[]> => {
                 hourly_rate,
                 allocated_hours,
                 joined_at
-            `)
+            `,
+            )
             .in("project_id", projectIds);
 
         // Get all member profiles
-        const memberUserIds = [...new Set(allMembers?.map(m => m.user_id) || [])];
+        const memberUserIds = [...new Set(allMembers?.map((m: { user_id: string }) => m.user_id) || [])];
         const { data: memberProfiles } = await supabase
             .from("profiles")
             .select("id, full_name, email, avatar_url")
             .in("id", memberUserIds);
 
-        const profileMap = new Map(memberProfiles?.map(p => [p.id, p]) || []);
+        const profileMap = new Map(
+            memberProfiles?.map((p: { id: string; full_name: string; email: string; avatar_url: string }) => [
+                p.id,
+                p,
+            ]) || [],
+        );
 
         // Get task counts for all projects
-        const { data: taskCounts } = await supabase
-            .from("tasks")
-            .select("project_id")
-            .in("project_id", projectIds);
+        const { data: taskCounts } = await supabase.from("tasks").select("project_id").in("project_id", projectIds);
 
-        const taskCountMap = new Map();
-        taskCounts?.forEach(task => {
+        const taskCountMap = new Map<string, number>();
+        taskCounts?.forEach((task: { project_id: string }) => {
             const count = taskCountMap.get(task.project_id) || 0;
             taskCountMap.set(task.project_id, count + 1);
         });
 
         // Combine all data
-        const result = projects.map((project: any) => {
-            const members = (allMembers || [])
-                .filter(m => m.project_id === project.id)
-                .map(m => ({
-                    ...m,
-                    profile: profileMap.get(m.user_id)
-                }));
+        const result = projects.map(
+            (project: { id: string; project_manager_id: string | null; [key: string]: unknown }) => {
+                const members = (allMembers || [])
+                    .filter((m: { project_id: string }) => m.project_id === project.id)
+                    .map((m: { user_id: string; [key: string]: unknown }) => ({
+                        ...m,
+                        profile: profileMap.get(m.user_id as string),
+                    }));
 
-            return {
-                ...project,
-                project_manager: project.project_manager_id ? managerMap.get(project.project_manager_id) : null,
-                members,
-                tasks_count: taskCountMap.get(project.id) || 0
-            };
-        });
+                return {
+                    ...project,
+                    project_manager: project.project_manager_id ? managerMap.get(project.project_manager_id) : null,
+                    members,
+                    tasks_count: taskCountMap.get(project.id) || 0,
+                };
+            },
+        );
 
         return result;
     } catch (error) {
@@ -132,11 +143,7 @@ export const getProjectByIdApi = async (id: string): Promise<Project> => {
 
     if (!user) throw new Error("Not authenticated");
 
-    const { data: project, error } = await supabase
-        .from("projects")
-        .select("*")
-        .eq("id", id)
-        .single();
+    const { data: project, error } = await supabase.from("projects").select("*").eq("id", id).single();
 
     if (error) throw error;
 
@@ -154,42 +161,41 @@ export const getProjectByIdApi = async (id: string): Promise<Project> => {
     // Get members
     const { data: members } = await supabase
         .from("project_members")
-        .select(`
+        .select(
+            `
             id,
             user_id,
             role,
             hourly_rate,
             allocated_hours,
             joined_at
-        `)
+        `,
+        )
         .eq("project_id", id);
 
     // Get member profiles
     if (members && members.length > 0) {
-        const userIds = members.map(m => m.user_id);
+        const userIds = members.map((m: { user_id: string }) => m.user_id);
         const { data: profiles } = await supabase
             .from("profiles")
             .select("id, full_name, email, avatar_url")
             .in("id", userIds);
 
-        const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
-        
-        members.forEach((member: any) => {
+        const profileMap = new Map(profiles?.map((p: { id: string; [key: string]: unknown }) => [p.id, p]) || []);
+
+        members.forEach((member: { user_id: string; profile?: unknown }) => {
             member.profile = profileMap.get(member.user_id);
         });
     }
 
     // Count tasks
-    const { count } = await supabase
-        .from("tasks")
-        .select("*", { count: "exact", head: true })
-        .eq("project_id", id);
+    const { count } = await supabase.from("tasks").select("*", { count: "exact", head: true }).eq("project_id", id);
 
-    return { 
-        ...project, 
+    return {
+        ...project,
         project_manager,
         members: members || [],
-        tasks_count: count || 0 
+        tasks_count: count || 0,
     };
 };
 
@@ -256,27 +262,29 @@ export const updateProjectApi = async ({
     // Get members
     const { data: members } = await supabase
         .from("project_members")
-        .select(`
+        .select(
+            `
             id,
             user_id,
             role,
             hourly_rate,
             allocated_hours,
             joined_at
-        `)
+        `,
+        )
         .eq("project_id", id);
 
     // Get member profiles
     if (members && members.length > 0) {
-        const userIds = members.map(m => m.user_id);
+        const userIds = members.map((m: { user_id: string }) => m.user_id);
         const { data: profiles } = await supabase
             .from("profiles")
             .select("id, full_name, email, avatar_url")
             .in("id", userIds);
 
-        const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
-        
-        members.forEach((member: any) => {
+        const profileMap = new Map(profiles?.map((p: { id: string; [key: string]: unknown }) => [p.id, p]) || []);
+
+        members.forEach((member: { user_id: string; profile?: unknown }) => {
             member.profile = profileMap.get(member.user_id);
         });
     }
@@ -290,10 +298,9 @@ export const deleteProjectApi = async (id: string): Promise<void> => {
     if (error) throw error;
 };
 
-
 export const listProjectMembersApi = async (projectId: string): Promise<ProjectMember[]> => {
     const supabase = createClient();
-    
+
     const { data: members, error } = await supabase
         .from("project_members")
         .select("*")
@@ -304,17 +311,17 @@ export const listProjectMembersApi = async (projectId: string): Promise<ProjectM
     if (!members || members.length === 0) return [];
 
     // Get all profiles
-    const userIds = members.map(m => m.user_id);
+    const userIds = members.map((m: { user_id: string }) => m.user_id);
     const { data: profiles } = await supabase
         .from("profiles")
         .select("id, full_name, email, avatar_url, role, department")
         .in("id", userIds);
 
-    const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+    const profileMap = new Map(profiles?.map((p: { id: string; [key: string]: unknown }) => [p.id, p]) || []);
 
-    return members.map(member => ({
+    return members.map((member: { user_id: string; [key: string]: unknown }) => ({
         ...member,
-        profile: profileMap.get(member.user_id)
+        profile: profileMap.get(member.user_id),
     }));
 };
 
@@ -378,9 +385,9 @@ export const addProjectMemberApi = async ({
 };
 
 export const updateProjectMemberApi = async (
-    supabase: any,
+    supabase: ReturnType<typeof createClient>,
     membershipId: string,
-    updates: Partial<ProjectMember>
+    updates: Partial<ProjectMember>,
 ): Promise<ProjectMember> => {
     const { data, error } = await supabase
         .from("project_members")
@@ -407,7 +414,6 @@ export const removeProjectMemberApi = async (membershipId: string): Promise<void
     if (error) throw error;
 };
 
-
 export const getProjectStatsApi = async (projectId: string) => {
     const supabase = createClient();
     const {
@@ -426,7 +432,7 @@ export const getProjectStatsApi = async (projectId: string) => {
         done: 0,
     };
 
-    tasksByStatus?.forEach((task: any) => {
+    tasksByStatus?.forEach((task: { status: string }) => {
         if (task.status in statusCounts) {
             statusCounts[task.status as keyof typeof statusCounts]++;
         }

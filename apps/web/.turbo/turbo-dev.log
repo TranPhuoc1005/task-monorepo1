@@ -1,0 +1,17 @@
+
+> web@0.1.0 dev C:\Users\Admin\Desktop\PhuocTH\Tasks\Task_monorepo\task-monorepo\apps\web
+> next dev --turbopack
+
+   ▲ Next.js 15.5.4 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.3.11:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Compiled middleware in 192ms
+ ✓ Ready in 1333ms
+🔍 Middleware running for: /projects
+👤 User: tranphuoc1005@gmail.com
+📍 Path: /projects
+✅ Allowing access to: /projects
+ ○ Compiling /projects ...
