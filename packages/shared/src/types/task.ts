@@ -7,6 +7,7 @@ export interface Task {
     due_date?: string;
     tags?: string[];
     user_id?: string | null;
+    assignee?: string;
     created_by?: string;
     created_at: string;
     updated_at: string;

@@ -1,69 +1,52 @@
 
-> web@0.1.0 build E:\CyperSoft\taskpro-monorepo\apps\web
+> web@0.1.0 build C:\Users\Admin\Desktop\PhuocTH\Tasks\Task_monorepo\task-monorepo\apps\web
 > next build
-
- ⚠ Invalid next.config.mjs options detected: 
- ⚠     Expected object, received boolean at "experimental.turbo"
- ⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
- ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
- We detected multiple lockfiles and selected the directory of E:\CyperSoft\taskpro-monorepo\pnpm-lock.yaml as the root directory.
- To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
-   See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
- Detected additional lockfiles: 
-   * E:\CyperSoft\taskpro-monorepo\apps\web\package-lock.json
 
    ▲ Next.js 15.5.4
    - Environments: .env.local
 
    Creating an optimized production build ...
 <w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (118kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
- ✓ Compiled successfully in 40s
-   Linting and checking validity of types ...
+ ⚠ Compiled with warnings in 1164ms
 
-./src/app/(dashboard)/settings/page.tsx
-42:19  Warning: 'profile' is assigned a value but never used.  @typescript-eslint/no-unused-vars
-74:8  Warning: React Hook useEffect has a missing dependency: 'loadSettings'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+../../node_modules/.pnpm/@supabase+realtime-js@2.77.0/node_modules/@supabase/realtime-js/dist/module/lib/websocket-factory.js
+A Node.js API is used (process.versions at line: 32) which is not supported in the Edge Runtime.
+Learn more: https://nextjs.org/docs/api-reference/edge-runtime
 
-info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
-   Collecting page data ...
-   Generating static pages (0/23) ...
-   Generating static pages (5/23) 
-   Generating static pages (11/23) 
-   Generating static pages (17/23) 
- ✓ Generating static pages (23/23)
-   Finalizing page optimization ...
-   Collecting build traces ...
+Import trace for requested module:
+../../node_modules/.pnpm/@supabase+realtime-js@2.77.0/node_modules/@supabase/realtime-js/dist/module/lib/websocket-factory.js
+../../node_modules/.pnpm/@supabase+realtime-js@2.77.0/node_modules/@supabase/realtime-js/dist/module/index.js
+../../node_modules/.pnpm/@supabase+supabase-js@2.77.0/node_modules/@supabase/supabase-js/dist/module/index.js
+../../node_modules/.pnpm/@supabase+ssr@0.7.0_@supabase+supabase-js@2.77.0/node_modules/@supabase/ssr/dist/module/createBrowserClient.js
+../../node_modules/.pnpm/@supabase+ssr@0.7.0_@supabase+supabase-js@2.77.0/node_modules/@supabase/ssr/dist/module/index.js
+./src/lib/supabase/middleware.ts
 
-Route (app)                                 Size  First Load JS
-┌ ○ /                                     106 kB         276 kB
-├ ○ /_not-found                            993 B         103 kB
-├ ƒ /api/create-user                       151 B         102 kB
-├ ƒ /api/notifications                     151 B         102 kB
-├ ƒ /api/profile                           151 B         102 kB
-├ ƒ /api/tasks                             151 B         102 kB
-├ ƒ /api/tasks/due-date                    151 B         102 kB
-├ ƒ /api/tasks/move                        151 B         102 kB
-├ ƒ /api/team-members                      151 B         102 kB
-├ ƒ /api/team-members/role                 151 B         102 kB
-├ ƒ /api/teams                             151 B         102 kB
-├ ƒ /api/users                             151 B         102 kB
-├ ƒ /api/users/role                        151 B         102 kB
-├ ○ /calendar                            2.98 kB         212 kB
-├ ○ /login                               42.2 kB         206 kB
-├ ○ /profile                             4.77 kB         174 kB
-├ ○ /settings                            6.47 kB         182 kB
-├ ○ /tasks                               3.47 kB         212 kB
-├ ƒ /tasks/[id]                            151 B         102 kB
-├ ○ /team                                2.24 kB         169 kB
-└ ○ /users                               4.99 kB         186 kB
-+ First Load JS shared by all             102 kB
-  ├ chunks/22826e1c-a60f68439ec4a62e.js  54.2 kB
-  ├ chunks/460-43574f6e3f2b2a78.js       45.8 kB
-  └ other shared chunks (total)          2.02 kB
+../../node_modules/.pnpm/@supabase+supabase-js@2.77.0/node_modules/@supabase/supabase-js/dist/module/index.js
+A Node.js API is used (process.version at line: 24) which is not supported in the Edge Runtime.
+Learn more: https://nextjs.org/docs/api-reference/edge-runtime
 
+Import trace for requested module:
+../../node_modules/.pnpm/@supabase+supabase-js@2.77.0/node_modules/@supabase/supabase-js/dist/module/index.js
+../../node_modules/.pnpm/@supabase+ssr@0.7.0_@supabase+supabase-js@2.77.0/node_modules/@supabase/ssr/dist/module/createBrowserClient.js
+../../node_modules/.pnpm/@supabase+ssr@0.7.0_@supabase+supabase-js@2.77.0/node_modules/@supabase/ssr/dist/module/index.js
+./src/lib/supabase/middleware.ts
 
-ƒ Middleware                             79.9 kB
+ ✓ Compiled successfully in 11.7s
+   Skipping linting
+   Checking validity of types ...
+Failed to compile.
 
-○  (Static)   prerendered as static content
-ƒ  (Dynamic)  server-rendered on demand
+.next/types/app/(dashboard)/projects/[id]/page.ts:34:29
+Type error: Type '{ params: { id: string; }; }' does not satisfy the constraint 'PageProps'.
+  Types of property 'params' are incompatible.
+    Type '{ id: string; }' is missing the following properties from type 'Promise<any>': then, catch, finally, [Symbol.toStringTag]
 
+[0m [90m 32 |[39m
+ [90m 33 |[39m [90m// Check the prop type of the entry function[39m
+[31m[1m>[22m[39m[90m 34 |[39m checkFields[33m<[39m[33mDiff[39m[33m<[39m[33mPageProps[39m[33m,[39m [33mFirstArg[39m[33m<[39m[33mTEntry[39m[[32m'default'[39m][33m>[39m[33m,[39m [32m'default'[39m[33m>>[39m()
+ [90m    |[39m                             [31m[1m^[22m[39m
+ [90m 35 |[39m
+ [90m 36 |[39m [90m// Check the arguments and return type of the generateMetadata function[39m
+ [90m 37 |[39m [36mif[39m ([32m'generateMetadata'[39m [36min[39m entry) {[0m
+Next.js build worker exited with code: 1 and signal: null
+ ELIFECYCLE  Command failed with exit code 1.

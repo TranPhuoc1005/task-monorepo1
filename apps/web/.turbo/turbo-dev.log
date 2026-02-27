@@ -15,3 +15,28 @@
 📍 Path: /projects
 ✅ Allowing access to: /projects
  ○ Compiling /projects ...
+ ✓ Compiled /projects in 2.9s
+ GET /projects 200 in 3361ms
+ ✓ Compiled /favicon.ico in 250ms
+ GET /favicon.ico?favicon.0b3bf435.ico 200 in 548ms
+ ✓ Compiled in 135ms
+🔍 Middleware running for: /projects
+ ✓ Compiled in 107ms
+👤 User: tranphuoc1005@gmail.com
+📍 Path: /projects
+✅ Allowing access to: /projects
+ ✓ Compiled /projects in 55ms
+ GET /projects 200 in 234ms
+ ✓ Compiled in 146ms
+ ✓ Compiled in 120ms
+ ✓ Compiled in 111ms
+ ✓ Compiled in 101ms
+ ⚠ Found a change in next.config.js. Restarting the server to apply the changes...
+   ▲ Next.js 15.5.4 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.3.11:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Compiled middleware in 202ms
+ ✓ Ready in 1378ms

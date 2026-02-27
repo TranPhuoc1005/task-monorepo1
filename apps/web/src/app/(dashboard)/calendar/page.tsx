@@ -9,7 +9,7 @@ import { Task } from "@taskpro/shared";
 type ViewMode = "month" | "week" | "day";
 
 export default function CalendarPage() {
-    const { tasks, updateDueDate, currentUser, error, isLoading } = useTasks();
+    const { tasks, updateDueDate, currentUser, isLoading } = useTasks();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [viewMode, setViewMode] = useState<ViewMode>("month");
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
