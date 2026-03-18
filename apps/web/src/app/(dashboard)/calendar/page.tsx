@@ -41,7 +41,7 @@ export default function CalendarPage() {
     }, [startDate, monthEnd]);
 
     const getTasksForDate = (date: Date) => {
-        return tasks.filter((task) => {
+        return tasks.filter((task: Task) => {
             if (!task.due_date) return false;
             const taskDate = new Date(task.due_date);
             return (

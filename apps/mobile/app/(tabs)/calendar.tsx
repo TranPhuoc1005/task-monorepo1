@@ -44,7 +44,7 @@ export default function CalendarScreen() {
     const getTasksForDate = (date: Date) => {
         if (!tasks || tasks.length === 0) return [];
 
-        return tasks.filter((task) => {
+        return tasks.filter((task: any) => {
             if (!task.due_date) return false;
 
             try {

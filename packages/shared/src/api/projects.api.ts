@@ -128,7 +128,7 @@ export const listProjectsApi = async (): Promise<Project[]> => {
             },
         );
 
-        return result;
+        return result as unknown as Project[];
     } catch (error) {
         console.error("listProjectsApi error:", error);
         throw error;
@@ -322,7 +322,7 @@ export const listProjectMembersApi = async (projectId: string): Promise<ProjectM
     return members.map((member: { user_id: string; [key: string]: unknown }) => ({
         ...member,
         profile: profileMap.get(member.user_id),
-    }));
+    })) as unknown as ProjectMember[];
 };
 
 export const addProjectMemberApi = async ({
