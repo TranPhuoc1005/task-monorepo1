@@ -279,7 +279,7 @@ export default function CalendarPage() {
 
                                     {/* Tasks for this day */}
                                     <div className="space-y-1">
-                                        {tasksForDay.slice(0, 3).map((task) => (
+                                        {tasksForDay.slice(0, 3).map((task: Task) => (
                                             <div
                                                 key={task.id}
                                                 draggable={canCreateTask}
@@ -365,7 +365,7 @@ export default function CalendarPage() {
 
                         <div className="space-y-3 max-h-96 overflow-y-auto">
                             {getTasksForDate(selectedDate).length > 0 ? (
-                                getTasksForDate(selectedDate).map((task) => (
+                                getTasksForDate(selectedDate).map((task: Task) => (
                                     <div
                                         key={task.id}
                                         className="p-4 border border-slate-200 rounded-lg hover:border-slate-300 transition-colors">

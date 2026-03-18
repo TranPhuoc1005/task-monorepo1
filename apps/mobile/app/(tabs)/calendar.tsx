@@ -138,7 +138,7 @@ export default function CalendarScreen() {
                                     <Text style={[styles.dayText, today && { color: "#fff" }]}>{day.getDate()}</Text>
                                 </View>
 
-                                {tasksForDay.slice(0, 2).map((task) => (
+                                {tasksForDay.slice(0, 2).map((task: any) => (
                                     <View
                                         key={task.id}
                                         style={[styles.taskDot, { backgroundColor: getPriorityColor(task.priority) }]}
@@ -169,7 +169,7 @@ export default function CalendarScreen() {
 
                         <ScrollView>
                             {selectedDate && getTasksForDate(selectedDate).length > 0 ? (
-                                getTasksForDate(selectedDate).map((task) => (
+                                getTasksForDate(selectedDate).map((task: any) => (
                                     <View key={task.id} style={styles.taskCard}>
                                         <Text style={styles.taskTitle}>{task.title}</Text>
                                         {task.description ? (
